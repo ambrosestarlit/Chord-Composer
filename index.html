@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="コード伴奏、アルペジオ、単音バッキング、カウンターメロディ、フィルイン、オスティナートを組み合わせられるブラウザ作曲ツール">
+  <meta name="theme-color" content="#090909">
+  <title>Chord Composer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">GITHUB PAGES MUSIC TOOL</p>
+        <h1>Chord Composer</h1>
+        <p class="lead">コード伴奏と単音フレーズを組み合わせ、右手を自動転回して滑らかな進行を作成します。</p>
+      </div>
+      <div class="status-pill" id="audioStatus">Audio: 待機中</div>
+    </header>
+
+    <div class="workspace">
+      <aside class="left-pane" aria-label="設定とテンプレート">
+        <section class="panel project-panel" aria-labelledby="project-title">
+          <div class="panel-title-row compact-title-row">
+            <div>
+              <p class="section-kicker">PROJECT</p>
+              <h2 id="project-title">読み込み・書き出し</h2>
+              <p>JSONでプロジェクトを保存・復元できます。</p>
+            </div>
+          </div>
+
+          <div class="project-actions">
+            <button id="projectImportButton" class="button button-secondary" type="button">JSON読み込み</button>
+            <button id="projectExportButton" class="button button-primary" type="button">JSON書き出し</button>
+            <input id="projectFileInput" class="visually-hidden" type="file" accept="application/json,.json">
+          </div>
+
+          <div class="audio-export-area">
+            <span class="subsection-label">音源書き出し</span>
+            <div class="project-actions">
+              <button id="exportMidiButton" class="button button-secondary" type="button">MIDI</button>
+              <button id="exportWavButton" class="button button-secondary" type="button">WAV</button>
+            </div>
+          </div>
+          <p id="projectIoMessage" class="project-message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel control-panel" aria-labelledby="transport-title">
+          <div class="panel-title-row compact-title-row">
+            <div>
+              <p class="section-kicker">PLAYBACK</p>
+              <h2 id="transport-title">再生・挿入設定</h2>
+              <p>新しく挿入するコードへ適用します。</p>
+            </div>
+          </div>
+
+          <div class="control-grid">
+            <label class="field">
+              <span>BPM</span>
+              <input id="bpmInput" type="number" min="30" max="300" step="1" value="120">
+            </label>
+
+            <label class="field">
+              <span>挿入する長さ</span>
+              <select id="lengthSelect">
+                <option value="1">1拍</option>
+                <option value="2">2拍</option>
+                <option value="4" selected>4拍</option>
+                <option value="8">8拍</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>挿入する演奏</span>
+              <select id="playStyleSelect">
+                <option value="block" selected>ベタ打ち</option>
+                <option value="quarter">四分弾き</option>
+                <option value="arpeggio">アルペジオ</option>
+                <option value="singleBacking">単音バッキング</option>
+                <option value="counterMelody">カウンターメロディ</option>
+                <option value="fillIn">フィルイン</option>
+                <option value="ostinato">オスティナート</option>
+              </select>
+            </label>
+
+            <div class="switch-stack">
+              <label class="switch-field">
+                <span>
+                  <strong>ルート音</strong>
+                  <small>左手用の低音</small>
+                </span>
+                <input id="rootNoteToggle" type="checkbox">
+                <span class="switch" aria-hidden="true"></span>
+              </label>
+
+              <label class="switch-field">
+                <span>
+                  <strong>裏拍</strong>
+                  <small>最後に8分音符</small>
+                </span>
+                <input id="offbeatToggle" type="checkbox">
+                <span class="switch" aria-hidden="true"></span>
+              </label>
+
+              <label class="switch-field">
+                <span>
+                  <strong>メトロノーム</strong>
+                  <small>再生・試聴時</small>
+                </span>
+                <input id="metronomeToggle" type="checkbox">
+                <span class="switch" aria-hidden="true"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel template-panel" aria-labelledby="template-title">
+          <div class="panel-title-row compact-title-row">
+            <div>
+              <p class="section-kicker">TEMPLATE</p>
+              <h2 id="template-title">コード進行テンプレート</h2>
+              <p>既存進行と保存した進行を使えます。</p>
+            </div>
+          </div>
+
+          <div class="template-controls">
+            <label class="field">
+              <span>テンプレート</span>
+              <select id="progressionTemplateSelect"></select>
+            </label>
+
+            <div class="template-buttons">
+              <button id="previewTemplateButton" class="button button-secondary" type="button">▶ 試聴</button>
+              <button id="insertTemplateButton" class="button button-add" type="button">＋ 挿入</button>
+            </div>
+          </div>
+
+          <div class="template-preview" aria-live="polite">
+            <div class="template-preview-heading">
+              <span class="selection-label">進行内容</span>
+              <span id="templateTypeBadge" class="template-type-badge">標準</span>
+            </div>
+            <strong id="templateChordList"></strong>
+            <p id="templateDescription"></p>
+          </div>
+
+          <div class="template-save-area">
+            <div>
+              <span class="subsection-label">現在の進行を保存</span>
+              <p>拍数・演奏方法・ルート音・裏拍も保存します。</p>
+            </div>
+
+            <label class="field">
+              <span>テンプレート名</span>
+              <input id="customTemplateName" type="text" maxlength="40" autocomplete="off" placeholder="例：静かなサビ進行">
+            </label>
+            <button id="saveTemplateButton" class="button button-primary button-wide" type="button">テンプレートに保存</button>
+            <button id="deleteTemplateButton" class="button button-danger button-wide" type="button">保存テンプレートを削除</button>
+            <p id="templateSaveMessage" class="template-save-message" aria-live="polite"></p>
+          </div>
+        </section>
+      </aside>
+
+      <section class="right-pane" aria-label="コード作成エリア">
+        <section class="panel chord-panel" aria-labelledby="chord-title">
+          <div class="panel-title-row chord-heading-row">
+            <div>
+              <p class="section-kicker">CHORD LIBRARY</p>
+              <h2 id="chord-title">コード</h2>
+              <p>コード名をクリックすると、現在の挿入設定で試聴できます。</p>
+            </div>
+
+            <label class="field compact-field">
+              <span>コード種類</span>
+              <select id="qualitySelect"></select>
+            </label>
+          </div>
+
+          <div id="chordGrid" class="chord-grid" role="list" aria-label="コード一覧"></div>
+
+          <div class="selection-bar">
+            <div>
+              <span class="selection-label">選択中</span>
+              <strong id="selectedChordLabel">C</strong>
+            </div>
+            <button id="addChordButton" class="button button-add" type="button">＋ 選択中のコードを挿入</button>
+          </div>
+        </section>
+
+        <section class="panel sequence-panel" aria-labelledby="sequence-title">
+          <div class="panel-title-row sequence-title-row">
+            <div>
+              <p class="section-kicker">ARRANGEMENT</p>
+              <h2 id="sequence-title">コード進行</h2>
+              <p>演奏・ルート音・裏拍は挿入後も変更できます。単音系4種は各コードで1巡のみ演奏します。</p>
+            </div>
+            <div id="sequenceSummary" class="sequence-summary">0コード / 0拍</div>
+          </div>
+
+          <div class="sequence-transport" aria-label="コード進行の再生操作">
+            <button id="playButton" class="button button-primary" type="button">▶ 再生</button>
+            <button id="stopButton" class="button button-secondary" type="button">■ 停止</button>
+            <button id="clearSequenceButton" class="button button-danger" type="button">進行を全削除</button>
+          </div>
+
+          <div id="emptySequence" class="empty-sequence">まだコードが挿入されていません。</div>
+          <div id="sequenceTrack" class="sequence-track" aria-live="polite"></div>
+        </section>
+      </section>
+    </div>
+
+    <footer>
+      <p>Chrome / Edge / Firefox の最新版を推奨</p>
+    </footer>
+  </main>
+
+  <template id="sequenceItemTemplate">
+    <article class="sequence-item" tabindex="0">
+      <div class="sequence-head">
+        <span class="sequence-index"></span>
+        <strong class="sequence-chord"></strong>
+        <span class="sequence-length"></span>
+      </div>
+
+      <span class="sequence-inversion">右手：基本形</span>
+
+      <label class="sequence-style-field">
+        <span>演奏</span>
+        <select class="sequence-style-select" aria-label="演奏方法">
+          <option value="block">ベタ打ち</option>
+          <option value="quarter">四分弾き</option>
+          <option value="arpeggio">アルペジオ</option>
+          <option value="singleBacking">単音バッキング</option>
+          <option value="counterMelody">カウンターメロディ</option>
+          <option value="fillIn">フィルイン</option>
+          <option value="ostinato">オスティナート</option>
+        </select>
+      </label>
+
+      <div class="sequence-options">
+        <label class="mini-toggle">
+          <input class="sequence-root-toggle" type="checkbox">
+          <span>ルート音</span>
+        </label>
+        <label class="mini-toggle">
+          <input class="sequence-offbeat-toggle" type="checkbox">
+          <span>裏拍</span>
+        </label>
+      </div>
+
+      <span class="delete-hint">余白をダブルクリックで削除</span>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
