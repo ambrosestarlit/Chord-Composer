@@ -16,7 +16,10 @@
         <h1>Chord Composer</h1>
         <p class="lead">コード伴奏と単音フレーズを組み合わせ、右手を自動転回して滑らかな進行を作成します。</p>
       </div>
-      <div class="status-pill" id="audioStatus">Audio: 待機中</div>
+      <div class="hero-actions">
+        <button id="helpButton" class="button button-secondary help-open-button" type="button" aria-haspopup="dialog" aria-controls="helpDialog">使い方</button>
+        <div class="status-pill" id="audioStatus">Audio: 待機中</div>
+      </div>
     </header>
 
     <div class="workspace">
@@ -215,12 +218,95 @@
     </footer>
   </main>
 
+  <dialog id="helpDialog" class="help-dialog" aria-labelledby="helpDialogTitle">
+    <div class="help-dialog-shell">
+      <header class="help-dialog-header">
+        <div>
+          <p class="section-kicker">GUIDE</p>
+          <h2 id="helpDialogTitle">Chord Composerの使い方</h2>
+        </div>
+        <button id="helpCloseButton" class="help-close-button" type="button" aria-label="使い方を閉じる">×</button>
+      </header>
+
+      <div class="help-dialog-content">
+        <section class="help-section">
+          <span class="help-step-number">1</span>
+          <div>
+            <h3>再生・挿入設定を決める</h3>
+            <p>左ペインでBPM、コードの長さ、演奏方法を設定します。ルート音は左手の低音、裏拍はコード末尾に同じルート音を8分音符で追加します。</p>
+          </div>
+        </section>
+
+        <section class="help-section">
+          <span class="help-step-number">2</span>
+          <div>
+            <h3>コードを選んで挿入する</h3>
+            <p>右ペインのコード名をクリックすると試聴できます。「＋ 選択中のコードを挿入」で、現在の設定を使ってコード進行の末尾へ追加します。</p>
+          </div>
+        </section>
+
+        <section class="help-section">
+          <span class="help-step-number">3</span>
+          <div>
+            <h3>挿入後のコードを調整する</h3>
+            <p>コード進行の各カードで、演奏方法・ルート音・裏拍を個別に変更できます。右手のコードは前後へ滑らかにつながるよう自動で転回され、左手のルート音は変わりません。</p>
+          </div>
+        </section>
+
+        <section class="help-section">
+          <span class="help-step-number">4</span>
+          <div>
+            <h3>再生・削除する</h3>
+            <p>コード進行上部の「▶ 再生」「■ 停止」で確認します。コードカードの余白をダブルクリックすると、そのコードだけ削除できます。「進行を全削除」ではすべて削除します。</p>
+          </div>
+        </section>
+
+        <section class="help-section">
+          <span class="help-step-number">5</span>
+          <div>
+            <h3>テンプレートを使う</h3>
+            <p>左ペインのコード進行テンプレートを選び、「▶ 試聴」で確認、「＋ 挿入」で現在の進行へ追加します。現在の進行には名前を付けてユーザーテンプレートとして保存できます。</p>
+          </div>
+        </section>
+
+        <section class="help-section">
+          <span class="help-step-number">6</span>
+          <div>
+            <h3>保存・読み込み・音源書き出し</h3>
+            <p>「JSON書き出し」でプロジェクトを保存し、「JSON読み込み」で復元します。MIDIまたはWAVを書き出すと、コードごとの演奏設定も反映されます。</p>
+          </div>
+        </section>
+
+        <section class="help-play-style-list" aria-labelledby="helpPlayStyleTitle">
+          <h3 id="helpPlayStyleTitle">演奏方法の違い</h3>
+          <dl>
+            <div><dt>ベタ打ち</dt><dd>コードを区間の最初にまとめて鳴らします。</dd></div>
+            <div><dt>四分弾き</dt><dd>右手のコードを1拍ごとに鳴らし直します。</dd></div>
+            <div><dt>アルペジオ</dt><dd>コード構成音を順番に鳴らし、コード区間中は繰り返します。</dd></div>
+            <div><dt>単音バッキング</dt><dd>コード構成音による短い伴奏を1巡だけ演奏します。</dd></div>
+            <div><dt>カウンターメロディ</dt><dd>主旋律を補うような単音フレーズを1巡だけ演奏します。</dd></div>
+            <div><dt>フィルイン</dt><dd>コード後半を飾る短いフレーズを1巡だけ演奏します。</dd></div>
+            <div><dt>オスティナート</dt><dd>短い定型フレーズを1巡だけ演奏します。</dd></div>
+          </dl>
+        </section>
+      </div>
+
+      <footer class="help-dialog-footer">
+        <span>背景クリック・Escキーでも閉じられます。</span>
+        <button id="helpFooterCloseButton" class="button button-primary" type="button">閉じる</button>
+      </footer>
+    </div>
+  </dialog>
+
   <template id="sequenceItemTemplate">
     <article class="sequence-item" tabindex="0">
       <div class="sequence-head">
         <span class="sequence-index"></span>
         <strong class="sequence-chord"></strong>
-        <span class="sequence-length"></span>
+        <label class="sequence-beats-field">
+          <span>拍数</span>
+          <input class="sequence-beats-input" type="number" min="1" max="32" step="1" inputmode="numeric" aria-label="コードの拍数">
+        </label>
       </div>
 
       <span class="sequence-inversion">右手：基本形</span>
