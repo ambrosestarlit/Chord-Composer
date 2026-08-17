@@ -163,6 +163,43 @@
             <p id="templateSaveMessage" class="template-save-message" aria-live="polite"></p>
           </div>
         </section>
+
+
+        <section class="panel accompaniment-template-panel" aria-labelledby="accompaniment-template-title">
+          <div class="panel-title-row compact-title-row">
+            <div>
+              <p class="section-kicker">BASS / DRUM TEMPLATE</p>
+              <h2 id="accompaniment-template-title">伴奏テンプレート</h2>
+              <p>入力タブに合わせてベース／ドラムのテンプレートを切り替えます。</p>
+            </div>
+          </div>
+
+          <div class="input-mode-tabs compact-mode-tabs" role="tablist" aria-label="伴奏テンプレート切り替え">
+            <button class="input-mode-tab is-active" type="button" data-input-mode="bass" role="tab" aria-selected="true">ベース入力用</button>
+            <button class="input-mode-tab" type="button" data-input-mode="drums" role="tab" aria-selected="false">ドラム入力用</button>
+          </div>
+
+          <div class="template-controls accompaniment-template-controls">
+            <label class="field">
+              <span>テンプレート</span>
+              <select id="accompanimentTemplateSelect"></select>
+            </label>
+            <div class="template-buttons">
+              <button id="previewAccompanimentTemplateButton" class="button button-secondary" type="button">▶ 試聴</button>
+              <button id="applyAccompanimentTemplateButton" class="button button-add" type="button">＋ 適用</button>
+            </div>
+          </div>
+
+          <div class="template-preview" aria-live="polite">
+            <div class="template-preview-heading">
+              <span class="selection-label">パターン内容</span>
+              <span id="accompanimentTemplateBadge" class="template-type-badge">ベース</span>
+            </div>
+            <strong id="accompanimentTemplateName"></strong>
+            <p id="accompanimentTemplateDescription"></p>
+          </div>
+        </section>
+
       </aside>
 
       <section class="right-pane" aria-label="コード作成エリア">
@@ -210,6 +247,47 @@
           <div id="emptySequence" class="empty-sequence">まだコードが挿入されていません。</div>
           <div id="sequenceTrack" class="sequence-track" aria-live="polite"></div>
         </section>
+
+        <section class="panel accompaniment-panel" aria-labelledby="accompaniment-title">
+          <div class="panel-title-row sequence-title-row">
+            <div>
+              <p class="section-kicker">BASS / DRUM INPUT</p>
+              <h2 id="accompaniment-title">ベース・ドラム入力</h2>
+              <p>1小節のパターンを作成し、コード進行の長さに合わせて繰り返します。</p>
+            </div>
+            <div id="accompanimentStatus" class="sequence-summary">ベース：OFF / ドラム：OFF</div>
+          </div>
+
+          <div class="input-mode-tabs" role="tablist" aria-label="伴奏入力切り替え">
+            <button class="input-mode-tab is-active" type="button" data-input-mode="bass" role="tab" aria-selected="true">ベース入力用</button>
+            <button class="input-mode-tab" type="button" data-input-mode="drums" role="tab" aria-selected="false">ドラム入力用</button>
+          </div>
+
+          <div id="bassInputView" class="accompaniment-view" data-mode-view="bass">
+            <div class="accompaniment-toolbar">
+              <label class="track-enable-field">
+                <input id="bassTrackToggle" type="checkbox">
+                <span>ベーストラックを使用</span>
+              </label>
+              <button id="clearBassPatternButton" class="button button-danger" type="button">ベースをクリア</button>
+            </div>
+            <p class="pattern-help">16分音符×16ステップ。コードが変わると、その位置のコードのルートを基準に「ルート／5度／オクターブ」を鳴らします。</p>
+            <div id="bassPatternGrid" class="pattern-editor" aria-label="ベースパターン入力"></div>
+          </div>
+
+          <div id="drumInputView" class="accompaniment-view" data-mode-view="drums" hidden>
+            <div class="accompaniment-toolbar">
+              <label class="track-enable-field">
+                <input id="drumTrackToggle" type="checkbox">
+                <span>ドラムトラックを使用</span>
+              </label>
+              <button id="clearDrumPatternButton" class="button button-danger" type="button">ドラムをクリア</button>
+            </div>
+            <p class="pattern-help">16分音符×16ステップ。8ビート、16ビート、4つ打ちのダンスビートをテンプレートから呼び出せます。</p>
+            <div id="drumPatternGrid" class="pattern-editor" aria-label="ドラムパターン入力"></div>
+          </div>
+        </section>
+
       </section>
     </div>
 
@@ -269,11 +347,20 @@
           </div>
         </section>
 
+
         <section class="help-section">
           <span class="help-step-number">6</span>
           <div>
+            <h3>ベース・ドラムを入力する</h3>
+            <p>右ペイン下部の「ベース入力用／ドラム入力用」タブで切り替えます。左ペインの伴奏テンプレートも同じタブに連動します。ベースはコードのルートに追従し、ドラムは16ステップの1小節パターンを繰り返します。</p>
+          </div>
+        </section>
+
+        <section class="help-section">
+          <span class="help-step-number">7</span>
+          <div>
             <h3>保存・読み込み・音源書き出し</h3>
-            <p>「JSON書き出し」でプロジェクトを保存し、「JSON読み込み」で復元します。MIDIまたはWAVを書き出すと、コードごとの演奏設定も反映されます。</p>
+            <p>「JSON書き出し」でプロジェクトを保存し、「JSON読み込み」で復元します。MIDIまたはWAVを書き出すと、コードごとの演奏設定に加えて、有効なベース・ドラムパターンも反映されます。</p>
           </div>
         </section>
 
